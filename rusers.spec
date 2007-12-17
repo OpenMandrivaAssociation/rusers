@@ -16,7 +16,6 @@ Patch3:		netkit-rusers-0.17-2.4.patch
 Patch4:		netkit-rusers-0.17-includes.patch
 Patch5:		netkit-rusers-0.17-2.6-stats.patch
 BuildRequires:	procps-devel
-Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 The rusers program allows users to find out who is logged into various machines
