@@ -1,7 +1,7 @@
 Summary:	Displays the users logged into machines on the local network
 Name:		rusers
 Version:	0.17
-Release: 	%mkrel 18
+Release: 	%mkrel 19
 License:	BSD
 Group:		Monitoring
 URL:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/
@@ -31,7 +31,7 @@ Summary:	Server for the rusers protocol
 Group:		System/Servers
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
-Requires:	portmap
+Requires:	rpcbind
 
 %description	server
 The rusers program allows users to find out who is logged into various machines
