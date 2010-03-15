@@ -1,7 +1,7 @@
 Summary:	Displays the users logged into machines on the local network
 Name:		rusers
 Version:	0.17
-Release: 	%mkrel 19
+Release: 	%mkrel 20
 License:	BSD
 Group:		Monitoring
 URL:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/
