@@ -1,0 +1,14 @@
+--- netkit-rusers-0.15/rpc.rstatd/GNUmakefile.warly	Fri Dec 31 10:29:22 1999
++++ netkit-rusers-0.15/rpc.rstatd/GNUmakefile	Fri Dec 31 10:30:26 1999
+@@ -6,9 +6,9 @@
+ CFLAGS += -DGNU_LIBC -D_GNU_SOURCE
+ endif
+ 
+-#LIBS += -lproc
++LIBS += -lproc
+ # XXX FIXME!
+-LIBS += /lib/$(shell cd /lib && echo libproc.so.*)
++# LIBS += /lib/$(shell cd /lib && echo libproc.so.*)
+ 
+ RPCGEN=rpcgen
+ 

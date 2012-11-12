@@ -1,0 +1,165 @@
+2006-03-23  Gwenole Beauchesne  <gbeauchesne@mandriva.com>
+
+	* rpc.rstatd/rstat_proc.c (errno): Nuke stupid decl.
+	(getstat_26): Tentatively grok new kernel 2.6 stats.
+	(getstat): Dispatch wrt. running kernel.
+
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.2.6-stats	2006-03-23 11:56:05.231195000 +0100
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	2006-03-23 16:06:44.904817544 +0100
+@@ -50,7 +50,7 @@ static char rcsid[] = "$OpenBSD: rstat_p
+ #include <rpc/rpc.h>
+ #include <sys/socket.h>
+ #include <syslog.h>
+-#include <sys/errno.h>
++#include <errno.h>
+ #include <sys/param.h>
+ #include <unistd.h>
+ 
+@@ -58,6 +58,7 @@ static char rcsid[] = "$OpenBSD: rstat_p
+ 
+ #include <assert.h>
+ #include <ctype.h>
++#include <sys/utsname.h>
+ 
+ #define	CP_USER		0
+ #define	CP_NICE		1
+@@ -307,7 +308,6 @@ static int havedisk(void);
+ void	rstat_service(struct svc_req *rqstp, SVCXPRT *transp);
+ 
+ static int stat_is_init = 0;
+-extern int errno;
+ 
+ #ifndef FSCALE
+ #define FSCALE (1 << 8)
+@@ -395,10 +395,106 @@ struct _ldisk {
+ 	unsigned int wblk[MAX_DISKS];
+ };
+ 
++static int
++is_kernel_version(int major, int minor, int revision)
++{
++  static int kern_major = -1, kern_minor = -1, kern_revision = -1;
++  if (kern_major < 0) {
++    struct utsname buf;
++    kern_major = kern_minor = kern_revision = 0;
++    if (uname(&buf) == 0)
++      sscanf(buf.release, "%d.%d.%d", &kern_major, &kern_minor, &kern_revision);
++  }
++  return (kern_major > major
++	  || (kern_major == major && kern_minor > minor)
++	  || (kern_major == major && kern_minor == minor && kern_revision >= revision));
++}
++
++/* NOTES:
++ * - Newer kernels use 64-bit values, so results may be truncated for 32-bit systems
++ * - Only _ldisk->xfer[] seems to be used, so don't bother to fill in rio[] et al.
++ */
+ static void
+-getstat(unsigned long *cuse, unsigned long *cice, unsigned long *csys, unsigned long *cide,
+-	     unsigned *pin, unsigned *pout, unsigned *sin, unsigned *sout,
+-	     unsigned *itot, unsigned *i1, unsigned *ct, struct _ldisk *d)
++getstat_26(unsigned long *cuse, unsigned long *cice, unsigned long *csys, unsigned long *cide,
++	   unsigned *pin, unsigned *pout, unsigned *sin, unsigned *sout,
++	   unsigned *itot, unsigned *i1, unsigned *ct, struct _ldisk *d)
++{
++  FILE *fp;
++  char line[1024];
++
++  if ((fp = fopen("/proc/stat", "r")) != NULL) {
++    while ((fgets(line, sizeof(line), fp)) != NULL) {
++      if (strncmp(line, "cpu ", 4) == 0) {
++		unsigned long long v_user, v_nice, v_system, v_idle;
++		sscanf(line, "cpu  %llu %llu %llu %llu", &v_user, &v_nice, &v_system, &v_idle);
++		*cuse = v_user;
++		*cice = v_nice;
++		*csys = v_system;
++		*cide = v_idle;
++      }
++      else if (strncmp(line, "ctxt", 4) == 0) {
++		unsigned long long v;
++		sscanf(line, "ctxt %llu", &v);
++		*ct = v;
++      }
++      else if (strncmp(line, "intr", 4) == 0) {
++		unsigned long long v_irq_tot;
++		unsigned int v_irq1 = 1;
++		sscanf(line, "intr %llu %u", &v_irq_tot, &v_irq1);
++		assert(v_irq_tot > v_irq1);
++		*itot = v_irq_tot;
++		*i1 = v_irq1;
++      }
++    }
++    fclose(fp);
++  }
++
++  if ((fp = fopen("/proc/vmstat", "r")) != NULL) {
++    while ((fgets(line, sizeof(line), fp)) != NULL) {
++      if (line[0] != 'p')
++		continue;
++      unsigned int *vp = NULL;
++      if (strncmp(line, "pgpgin", 6) == 0)
++		vp = pin;
++      else if (strncmp(line, "pgpgout", 7) == 0)
++		vp = pout;
++      else if (strncmp(line, "pswpin", 6) == 0)
++		vp = sin;
++      else if (strncmp(line, "pswpout", 7) == 0)
++		vp = sout;
++      if (vp)
++		sscanf(line, "%*s %u", vp);
++    }
++    fclose(fp);
++  }
++
++  if ((fp = fopen("/proc/diskstats", "r")) != NULL) {
++    int ndisks = 0;
++    while ((fgets(line, sizeof(line), fp)) != NULL) {
++      unsigned int v1, v2, v4, v5;
++      unsigned long long v3;
++      int n = sscanf(line, "%*d %*d %*s %u %u %llu %u %u", &v1, &v2, &v3, &v4, &v5);
++      if (v1 == 0 && v2 == 0 && v3 == 0 && v4 == 0)
++		continue;
++      if (n == 5)
++		d->xfer[ndisks] = v1 + v5;
++      else if (n == 4)
++		d->xfer[ndisks] = v1 + v3;
++      else {
++		assert(n == 5 || n == 4);
++		continue;
++      }
++      if (++ndisks >= MAX_DISKS)
++		break;
++    }
++    fclose(fp);
++  }
++}
++
++static void
++getstat_24(unsigned long *cuse, unsigned long *cice, unsigned long *csys, unsigned long *cide,
++		   unsigned *pin, unsigned *pout, unsigned *sin, unsigned *sout,
++		   unsigned *itot, unsigned *i1, unsigned *ct, struct _ldisk *d)
+ {
+   static int stat;
+ #define	BUFFSIZE	1024
+@@ -441,6 +537,21 @@ getstat(unsigned long *cuse, unsigned lo
+   }
+ }
+ 
++static void
++getstat(unsigned long *cuse, unsigned long *cice, unsigned long *csys, unsigned long *cide,
++	unsigned *pin, unsigned *pout, unsigned *sin, unsigned *sout,
++	unsigned *itot, unsigned *i1, unsigned *ct, struct _ldisk *d)
++{
++  if (is_kernel_version(2,6,0))
++    getstat_26(cuse, cice, csys, cide, pin, pout, sin, sout, itot, i1, ct, d);
++  else if (is_kernel_version(2,4,20))
++    getstat_24(cuse, cice, csys, cide, pin, pout, sin, sout, itot, i1, ct, d);
++  else {
++	syslog(LOG_ERR, "only kernels newer than 2.4.20 are supported");
++	exit(1);
++  }
++}
++
+ static int procnetdev_vsn;
+ 
+ static char *
