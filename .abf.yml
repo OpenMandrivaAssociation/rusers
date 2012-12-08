@@ -1,5 +1,3 @@
 sources:
-  "netkit-rusers-0.17.tar.bz2:"	ae0f16c61e6c728a3324bf0d6647789434011412
-  "rstatd.init:"	0f9d683f139cea00e0e7dd18a9f27ad75fb1cdf2
-  "rstatd.tar.bz2:"	c5047121808c8af0c31664fc3b364aef63394b81
-  "rusersd.init:"	a4951fe7bf77411068faa724c5549e0cba760ba8
+  "netkit-rusers-0.17.tar.bz2": ae0f16c61e6c728a3324bf0d6647789434011412
+  "rstatd.tar.bz2": c5047121808c8af0c31664fc3b364aef63394b81

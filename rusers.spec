@@ -1,7 +1,7 @@
 Summary:	Displays the users logged into machines on the local network
 Name:		rusers
 Version:	0.17
-Release: 	%mkrel 22
+Release: 	%mkrel 24
 License:	BSD
 Group:		Monitoring
 URL:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/
@@ -108,4 +108,62 @@ rm -rf %{buildroot}
 %{_mandir}/man8/*
 %{_sbindir}/*
 
+
+
+
+%changelog
+* Thu May 05 2011 Oden Eriksson <oeriksson@mandriva.com> 0.17-22mdv2011.0
++ Revision: 669464
+- mass rebuild
+
+* Fri Dec 03 2010 Oden Eriksson <oeriksson@mandriva.com> 0.17-21mdv2011.0
++ Revision: 607384
+- rebuild
+
+* Mon Mar 15 2010 Oden Eriksson <oeriksson@mandriva.com> 0.17-20mdv2010.1
++ Revision: 520211
+- rebuilt for 2010.1
+
+* Sun Jul 26 2009 Guillaume Rousse <guillomovitch@mandriva.org> 0.17-19mdv2010.0
++ Revision: 400288
+- fixw dependencies
+
+* Fri Dec 19 2008 Oden Eriksson <oeriksson@mandriva.com> 0.17-18mdv2009.1
++ Revision: 316187
+- rebuild
+
+* Wed Jun 18 2008 Thierry Vignaud <tv@mandriva.org> 0.17-17mdv2009.0
++ Revision: 225341
+- rebuild
+
+* Wed Mar 05 2008 Oden Eriksson <oeriksson@mandriva.com> 0.17-16mdv2008.1
++ Revision: 179478
+- rebuild
+
+  + Olivier Blin <oblin@mandriva.com>
+    - restore BuildRoot
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+
+* Sat Mar 17 2007 Oden Eriksson <oeriksson@mandriva.com> 0.17-15mdv2007.1
++ Revision: 145572
+- Import rusers
+
+* Sat Mar 17 2007 Oden Eriksson <oeriksson@mandriva.com> 0.17-15mdv2007.1
+- use the %%mrel macro
+- bunzip patches
+
+* Thu Mar 23 2006 Gwenole Beauchesne <gbeauchesne@mandriva.com> 0.17-14mdk
+- fix rpc.rstatd for 2.6 kernels...
+
+* Sun Jan 01 2006 Mandriva Linux Team <http://www.mandrivaexpert.com/> 0.17-13mdk
+- Rebuild
+
+* Fri Feb 25 2005 Thierry Vignaud <tvignaud@mandrakesoft.com> 0.17-12mdk
+- rebuild for new libproc
+
+* Sat May 15 2004 Nicolas Planel <nplanel@mandrakesoft.com> 0.17-11mdk
+- rebuild fot cooker.
 
