@@ -5,7 +5,7 @@ Release: 	%mkrel 24
 License:	BSD
 Group:		Monitoring
 URL:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/
-Source:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/netkit-rusers-%{version}.tar.bz2
+Source0:	ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/netkit-rusers-%{version}.tar.bz2
 Source1:	rusersd.init
 Source2:	rstatd.tar.bz2
 Source3:	rstatd.init
@@ -15,8 +15,7 @@ Patch2:		rusers-0.15-libproc.patch
 Patch3:		netkit-rusers-0.17-2.4.patch
 Patch4:		netkit-rusers-0.17-includes.patch
 Patch5:		netkit-rusers-0.17-2.6-stats.patch
-BuildRequires:	procps-devel
-Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires:	pkgconfig(libprocps)
 
 %description
 The rusers program allows users to find out who is logged into various machines
