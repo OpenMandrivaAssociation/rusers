@@ -1,7 +1,7 @@
 Summary:	Displays the users logged into machines on the local network
 Name:		rusers
 Version:	0.17
-Release: 	%mkrel 24
+Release: 	25
 License:	BSD
 Group:		Monitoring
 URL:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/
@@ -16,6 +16,7 @@ Patch3:		netkit-rusers-0.17-2.4.patch
 Patch4:		netkit-rusers-0.17-includes.patch
 Patch5:		netkit-rusers-0.17-2.6-stats.patch
 BuildRequires:	pkgconfig(libprocps)
+BuildRequires:	tirpc-devel
 
 %description
 The rusers program allows users to find out who is logged into various machines
