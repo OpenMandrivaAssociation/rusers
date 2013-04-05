@@ -57,7 +57,8 @@ into your machine.
 %serverbuild
 sh configure
 perl -pi -e 's,-O2,\$(RPM_OPT_FLAGS),' MCONFIG
-
+ln -s /usr/include/rpcsvc/rusers.h rusers/rusers.h
+ln -s /usr/include/rpcsvc/rusers.h rpc.rusersd/rusers.h
 %make
 %make -C rpc.rstatd
 
