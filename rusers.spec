@@ -9,6 +9,8 @@ Source0:	ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/netkit-rusers-%{
 Source1:	rusersd.init
 Source2:	rstatd.tar.bz2
 Source3:	rstatd.init
+Source4:	rusers.x
+Source5:	rstat.x
 Patch0:		rstatd-jbj.patch
 Patch1:		netkit-rusers-0.15-numusers.patch
 Patch2:		rusers-0.15-libproc.patch
@@ -44,14 +46,16 @@ into your machine.
 
 %prep
 %setup -qn netkit-rusers-%{version} -a 2
+cp %{SOURCE4} %{SOURCE5} .
 %apply_patches
 
 %build
 %serverbuild
 sh configure
-perl -pi -e 's,-O2,\$(RPM_OPT_FLAGS),' MCONFIG
-ln -s /usr/include/rpcsvc/rusers.h rusers/rusers.h
-ln -s /usr/include/rpcsvc/rusers.h rpc.rusersd/rusers.h
+sed -i -e 's|-O2|\$(RPM_OPT_FLAGS)|' MCONFIG
+sed -i -e 's|LIBS=|LIBS=-ltirpc|' MCONFIG
+sed -i -e 's|/usr/include/rpcsvc/rusers.x|../rusers.x|g' */Makefile
+sed -i -e 's|/usr/include/rpcsvc/rstat.x|../rstat.x|g' */*akefile
 
 %make
 %make -C rpc.rstatd
@@ -73,8 +77,6 @@ for i in rstatd rusersd; do
 	rm $i.8
 	ln -s rpc.$i.8.bz2 $i.8.bz2
 done
-
-perl -pi -e "s|/etc/rc.d/init.d|%{_initrddir}|" %{buildroot}%{_initrddir}/*
 
 %post server
 %_post_service rusersd

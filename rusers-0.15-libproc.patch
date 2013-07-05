@@ -5,7 +5,7 @@
  endif
  
 -#LIBS += -lproc
-+LIBS += -lproc
++LIBS += -lprocps
  # XXX FIXME!
 -LIBS += /lib/$(shell cd /lib && echo libproc.so.*)
 +# LIBS += /lib/$(shell cd /lib && echo libproc.so.*)
