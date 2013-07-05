@@ -11,6 +11,7 @@ Source2:	rstatd.tar.bz2
 Source3:	rstatd.init
 Source4:	rusers.x
 Source5:	rstat.x
+Source100:	rusers.rpmlintrc
 Patch0:		rstatd-jbj.patch
 Patch1:		netkit-rusers-0.15-numusers.patch
 Patch2:		rusers-0.15-libproc.patch
