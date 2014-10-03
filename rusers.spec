@@ -1,14 +1,14 @@
 Summary:	Displays the users logged into machines on the local network
 Name:		rusers
 Version:	0.17
-Release:	31
+Release:	27
 License:	BSD
 Group:		Monitoring
 Url:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/
 Source0:	ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/netkit-rusers-%{version}.tar.bz2
-Source1:	rusersd.init
+Source1:	rusersd.service
 Source2:	rstatd.tar.bz2
-Source3:	rstatd.init
+Source3:	rstatd.service
 Source4:	rusers.x
 Source5:	rstat.x
 Source100:	rusers.rpmlintrc
@@ -18,7 +18,7 @@ Patch2:		rusers-0.15-libproc.patch
 Patch3:		netkit-rusers-0.17-2.4.patch
 Patch4:		netkit-rusers-0.17-includes.patch
 Patch5:		netkit-rusers-0.17-2.6-stats.patch
-BuildRequires:	pkgconfig(libprocps)
+BuildRequires:	procps-devel
 BuildRequires:	pkgconfig(libtirpc)
 
 %description
@@ -28,6 +28,13 @@ for the specified list of hosts or for all machines on the local network.
 
 Install rusers if you need to keep track of who is logged into your local
 network.
+
+%files
+%{_bindir}/rup
+%{_bindir}/rusers
+%{_mandir}/man1/*
+
+#----------------------------------------------------------------------------
 
 %package	server
 Summary:	Server for the rusers protocol
@@ -44,6 +51,27 @@ rusers-server package contains the server for responding to rusers requests.
 
 Install rusers-server if you want remote users to be able to see who is logged
 into your machine.
+
+%files server
+%doc  README ChangeLog BUGS
+%{_unitdir}/*
+%{_sbindir}/*
+%{_mandir}/man8/*
+
+
+%post server
+%systemd_post rstatd.service
+%systemd_post rusersd.service
+
+%preun server
+%systemd_preun rstatd.service
+%systemd_preun rusersd.service
+
+%postun server
+%systemd_postun_with_restart rstatd.service
+%systemd_postun_with_restart rusersd.service
+
+#----------------------------------------------------------------------------
 
 %prep
 %setup -qn netkit-rusers-%{version} -a 2
@@ -64,14 +92,14 @@ sed -i -e 's|/usr/include/rpcsvc/rstat.x|../rstat.x|g' */*akefile
 %install
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_sbindir}
-mkdir -p %{buildroot}%{_initrddir}
+mkdir -p %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_mandir}/{man1,man8}
 
 make INSTALLROOT=%{buildroot} install MANDIR=%{_mandir}
 make INSTALLROOT=%{buildroot} install -C rpc.rstatd MANDIR=%{_mandir}
 
-install -m 755 %SOURCE1 %{buildroot}%{_initrddir}/rusersd
-install -m 755 %SOURCE3 %{buildroot}%{_initrddir}/rstatd
+install -m 755 %{SOURCE1} %{buildroot}%{_unitdir}/rusersd.service
+install -m 755 %{SOURCE3} %{buildroot}%{_unitdir}/rstatd.service
 
 cd %{buildroot}%{_mandir}/man8
 for i in rstatd rusersd; do
@@ -79,23 +107,4 @@ for i in rstatd rusersd; do
 	ln -s rpc.$i.8.bz2 $i.8.bz2
 done
 
-%post server
-%_post_service rusersd
-%_post_service rstatd
-
-%preun server
-%_preun_service rusersd
-%_preun_service rstatd
-
-%files
-%{_bindir}/rup
-%{_bindir}/rusers
-%{_mandir}/man1/*
-
-%files server
-%doc  README ChangeLog BUGS
-%{_initrddir}/rusersd
-%{_initrddir}/rstatd
-%{_sbindir}/*
-%{_mandir}/man8/*
 
