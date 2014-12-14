@@ -18,7 +18,7 @@ Patch2:		rusers-0.15-libproc.patch
 Patch3:		netkit-rusers-0.17-2.4.patch
 Patch4:		netkit-rusers-0.17-includes.patch
 Patch5:		netkit-rusers-0.17-2.6-stats.patch
-BuildRequires:	procps-devel
+BuildRequires:	pkgconfig(libprocps)
 BuildRequires:	pkgconfig(libtirpc)
 
 %description
