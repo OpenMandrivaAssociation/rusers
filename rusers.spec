@@ -72,8 +72,8 @@ sed -i -e 's|LIBS=|LIBS=-ltirpc|' MCONFIG
 sed -i -e 's|/usr/include/rpcsvc/rusers.x|../rusers.x|g' */Makefile
 sed -i -e 's|/usr/include/rpcsvc/rstat.x|../rstat.x|g' */*akefile
 
-%make CC=%{__cc} CFLAGS="%{optflags}" LDFLAGS="%{ldflags}"
-%make CC=%{__cc} CFLAGS="%{optflags}" LDFLAGS="%{ldflags}" -C rpc.rstatd
+%make CC=gcc CFLAGS="%{optflags}" LDFLAGS="%{ldflags}"
+%make CC=gcc CFLAGS="%{optflags}" LDFLAGS="%{ldflags}" -C rpc.rstatd
 
 %install
 mkdir -p %{buildroot}%{_bindir}
