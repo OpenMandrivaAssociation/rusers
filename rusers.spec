@@ -1,7 +1,7 @@
 Summary:	Displays the users logged into machines on the local network
 Name:		rusers
 Version:	0.17
-Release:	30
+Release:	31
 License:	BSD
 Group:		Monitoring
 Url:		ftp://sunsite.unc.edu/pub/Linux/system/network/daemons/
@@ -39,7 +39,6 @@ network.
 %package	server
 Summary:	Server for the rusers protocol
 Group:		System/Servers
-Requires(post,preun):	rpm-helper
 Requires:	rpcbind
 
 %description	server
@@ -57,19 +56,6 @@ into your machine.
 %{_unitdir}/*
 %{_sbindir}/*
 %{_mandir}/man8/*
-
-
-%post server
-%systemd_post rstatd.service
-%systemd_post rusersd.service
-
-%preun server
-%systemd_preun rstatd.service
-%systemd_preun rusersd.service
-
-%postun server
-%systemd_postun_with_restart rstatd.service
-%systemd_postun_with_restart rusersd.service
 
 #----------------------------------------------------------------------------
 
@@ -106,5 +92,4 @@ for i in rstatd rusersd; do
 	rm $i.8
 	ln -s rpc.$i.8.bz2 $i.8.bz2
 done
-
 
