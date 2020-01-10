@@ -62,7 +62,7 @@ into your machine.
 %prep
 %setup -qn netkit-rusers-%{version} -a 2
 cp %{SOURCE4} %{SOURCE5} .
-%apply_patches
+%autopatch -p1
 
 %build
 %serverbuild
